@@ -46,11 +46,11 @@ app.post('/addpayment', async (req, res) => {
         const payload = req.body
         console.log("PAYLOAD: ", payload)
 
-        if(payload.data.status === "successful"){
-            const user = await Student.findOne({where: {matric: payload.data.customer.name}})
+        if(payload.status === "successful"){
+            const user = await Student.findOne({where: {matric: payload.customer.fullName}})
             if(user){
                 let credit = user.credits
-                const pay = Number(payload.data.amount)
+                const pay = Number(payload.amount)
                 credit = credit + pay
                 user.credits = credit
                 await user.save()
