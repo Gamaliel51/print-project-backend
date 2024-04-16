@@ -3,7 +3,9 @@ const  multer = require('multer')
 const cors = require('cors')
 const fs = require('node:fs')
 const path = require('path')
+const { Blob } = require('buffer')
 const {DocxCounter, PdfCounter} = require('page-count')
+require('dotenv').config()
 
 const authRoute = require('./routes/auth')
 const { checkAuth } = require('./controller/authMiddleware')
@@ -95,13 +97,15 @@ app.post('/printdoc', upload.array('files', 1), checkAuth, async (req, res) => {
 
     await user.save()
 
-    if (!fs.existsSync(folderName)) {
-        fs.mkdirSync(folderName);
-    }
+    // if (!fs.existsSync(folderName)) {
+    //     fs.mkdirSync(folderName);
+    // }
 
-    fs.createWriteStream(`${folderName}/${matric}-${file.originalname}`).write(file.buffer)
+    // fs.createWriteStream(`${folderName}/${matric}-${file.originalname}`).write(file.buffer)
 
-    const record = await PrintRecord.create({matric: matric, documentpath: `${folderName}/${matric}-${file.originalname}`, doctype: doctype, printed: 'false'})
+    const fileBlob = new Blob([file.buffer])
+
+    const record = await PrintRecord.create({matric: matric, documentpath: fileBlob, doctype: doctype, docname: `${matric}-${file.originalname}`, printed: 'false'})
     await record.save()
     
     res.json({status: "success"})

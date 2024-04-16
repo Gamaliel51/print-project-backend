@@ -6,9 +6,12 @@ const PrintRecord = sequelize.define('PrintRecord', {
         type: DataTypes.STRING
     },
     documentpath: {
-        type: DataTypes.STRING
+        type: DataTypes.BLOB
     },
     doctype: {
+        type: DataTypes.STRING
+    },
+    docname: {
         type: DataTypes.STRING
     },
     printed: {
