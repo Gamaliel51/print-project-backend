@@ -44,6 +44,7 @@ app.post('/getpagenum', upload.array('files', 1), async (req, res) => {
 app.post('/addpayment', async (req, res) => {
     try{
         const payload = req.body
+        console.log("PAYLOAD: ", payload)
 
         if(payload.data.status === "successful"){
             const user = await Student.findOne({where: {matric: payload.data.customer.name}})
