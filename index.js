@@ -2,6 +2,7 @@ const express = require('express')
 const  multer = require('multer')
 const cors = require('cors')
 const fs = require('node:fs')
+const path = require('path')
 const {DocxCounter, PdfCounter} = require('page-count')
 
 const authRoute = require('./routes/auth')
@@ -11,6 +12,7 @@ const PrintRecord = require('./models/PrintRecord')
 
 const app = express()
 
+app.use(express.static(path.join(__dirname + "/dist")))
 app.use(cors())
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
@@ -103,5 +105,13 @@ app.post('/printdoc', upload.array('files', 1), checkAuth, async (req, res) => {
     res.json({status: "success"})
 })
 
+app.get('/*', function(req,res) {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 
-app.listen(8000)
+app.get("*", (req, res) => {
+    res.send("Error")
+})
+
+
+app.listen(process.env.PORT)
