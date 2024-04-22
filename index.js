@@ -111,6 +111,15 @@ app.post('/printdoc', upload.array('files', 1), checkAuth, async (req, res) => {
     res.json({status: "success"})
 })
 
+app.get('/getdocs', async (req, res) => {
+    const records = await PrintRecord.findAll()
+    const new_records = records.map((record) => {
+        return {matric: record.matric, doctype: record.doctype, docname: record.docname, printed: record.printed}
+    })
+    console.log("NEW RECORDS: ", new_records)
+    res.json({status: 'success', data: new_records})
+})
+
 app.get('/*', function(req,res) {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
