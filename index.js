@@ -113,6 +113,7 @@ app.post('/printdoc', upload.array('files', 1), checkAuth, async (req, res) => {
 
 app.get('/getdocs', async (req, res) => {
     const records = await PrintRecord.findAll()
+    console.log("RECORDS: ", records)
     const new_records = records.map((record) => {
         return {matric: record.matric, doctype: record.doctype, docname: record.docname, printed: record.printed}
     })
