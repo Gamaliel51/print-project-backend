@@ -3,7 +3,7 @@ const  multer = require('multer')
 const cors = require('cors')
 const fs = require('node:fs')
 const path = require('path')
-const { Blob } = require('buffer')
+const { Blob, Buffer } = require('buffer')
 const {DocxCounter, PdfCounter} = require('page-count')
 require('dotenv').config()
 
@@ -121,9 +121,10 @@ app.post('/getdocbuffer', async (req, res) => {
     }
     const blob = record.documentpath
     console.log('BLOB: ', blob, " TYPE: ", typeof(blob))
-    // const bufferArray = blob.arrayBuffer()
-    // const buffer = Buffer.from(blob, 'binary')
-    res.end(blob)
+    const bufferArray = blob.arrayBuffer()
+    const buffer = Buffer.from(bufferArray)
+    console.log('BUFFER: ', buffer, " TYPE: ", typeof(buffer))
+    res.end(buffer)
 
 })
 
