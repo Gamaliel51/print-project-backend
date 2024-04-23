@@ -121,8 +121,7 @@ app.post('/getdocbuffer', async (req, res) => {
     }
     const blob = record.documentpath
     console.log('BLOB: ', blob, " TYPE: ", typeof(blob))
-    const bufferArray = blob.arrayBuffer()
-    const buffer = Buffer.from(bufferArray)
+    const buffer = Buffer.from(blob)
     console.log('BUFFER: ', buffer, " TYPE: ", typeof(buffer))
     res.end(buffer)
 
