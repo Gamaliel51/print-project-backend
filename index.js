@@ -105,7 +105,7 @@ app.post('/printdoc', upload.array('files', 1), checkAuth, async (req, res) => {
 
     const fileBlob = new Blob([file.buffer])
 
-    const record = await PrintRecord.create({matric: matric, documentpath: fileBlob, doctype: doctype, docname: `${matric}-${file.originalname}`, printed: 'false'})
+    const record = await PrintRecord.create({matric: matric, documentpath: file.buffer, doctype: doctype, docname: `${matric}-${file.originalname}`, printed: 'false'})
     await record.save()
     
     res.json({status: "success"})
