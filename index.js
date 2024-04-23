@@ -111,6 +111,21 @@ app.post('/printdoc', upload.array('files', 1), checkAuth, async (req, res) => {
     res.json({status: "success"})
 })
 
+app.post('/getdocbuffer', async (req, res) => {
+    const body = req.body
+    const docname = body.docname
+
+    const record = await PrintRecord.findOne({where: {docname: docname}})
+    if(!record){
+        return res.status(400)
+    }
+    const blob = record.documentpath
+    // const bufferArray = blob.arrayBuffer()
+    const buffer = Buffer.from(blob, 'binary')
+    res.send(buffer)
+
+})
+
 app.get('/getdocs', async (req, res) => {
     const records = await PrintRecord.findAll()
     console.log("RECORDS: ", records)
