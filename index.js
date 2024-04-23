@@ -120,9 +120,10 @@ app.post('/getdocbuffer', async (req, res) => {
         return res.status(400)
     }
     const blob = record.documentpath
+    console.log('BLOB: ', blob)
     // const bufferArray = blob.arrayBuffer()
     const buffer = Buffer.from(blob, 'binary')
-    res.send(buffer)
+    res.end(buffer)
 
 })
 
