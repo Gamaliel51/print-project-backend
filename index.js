@@ -87,6 +87,11 @@ app.post('/printdoc', upload.array('files', 1), checkAuth, async (req, res) => {
     const user = await Student.findOne({where: {matric: matric}})
 
     let credits = user.credits
+
+    if(cost > credits){
+        return res.json({status: 'fail', error: 'insufficient funds'})
+    }
+
     credits = credits - cost
     user.credits = credits
 
