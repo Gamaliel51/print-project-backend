@@ -1,6 +1,7 @@
 const express = require('express')
 const  multer = require('multer')
 const cors = require('cors')
+const bcrypt = require('bcrypt')
 const Flutterwave = require('flutterwave-node-v3')
 const path = require('path')
 const { Blob, Buffer } = require('buffer')
