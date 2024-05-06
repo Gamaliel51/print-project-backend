@@ -1,7 +1,7 @@
 const express = require('express')
 const  multer = require('multer')
 const cors = require('cors')
-const fs = require('node:fs')
+const Flutterwave = require('flutterwave-node-v3')
 const path = require('path')
 const { Blob, Buffer } = require('buffer')
 const {DocxCounter, PdfCounter} = require('page-count')
@@ -11,6 +11,8 @@ const authRoute = require('./routes/auth')
 const { checkAuth } = require('./controller/authMiddleware')
 const Student = require('./models/Student')
 const PrintRecord = require('./models/PrintRecord')
+
+const flw = new Flutterwave(process.env.FLW_PUBLIC_KEY, process.env.FLW_SECRET_KEY  );
 
 const app = express()
 
@@ -30,7 +32,7 @@ const folderName = '/PrintFiles'
 app.get('/studentinfo', cors(), checkAuth, async (req, res) => {
     const user = await Student.findOne({where: {matric: req.user.username}})
     if(user){
-        return res.json({status: 'success', matric: user.matric, email: user.email, credits: user.credits, history: user.history})
+        return res.json({status: 'success', matric: user.matric, email: user.email, credits: user.credits, account: user.account, bank: user.bank, history: user.history})
     }
     res.json({status: "fail", error: "No Such User"})
 })
@@ -40,6 +42,37 @@ app.post('/getpagenum', upload.array('files', 1), async (req, res) => {
     const file = req.files[0]
     const pages = await DocxCounter.count(file.buffer)
     res.json({num: pages})
+})
+
+
+app.post('/withdraw', cors(), checkAuth, async (req, res) => {
+    const {amount} = req.body
+    const user = await Student.findOne({where: {matric: req.user.username}})
+    if(user){
+        if(amount > user.credits){
+            return res.json({status: 'fail', error: 'insufficient funds'})
+        }
+
+        try {
+            const payload = {
+            "account_bank": user.bank,
+            "account_number": user.account,
+            "amount": Number(amount),
+            "narration": "CU Print withdrawal",
+            "currency": "NGN",
+            "reference": `${user.matric}-${Date.now()}`,
+            "callback_url": "https://www.flutterwave.com/ng/",
+            "debit_currency": "NGN"
+        }
+    
+            const response = await flw.Transfer.initiate(payload)
+            console.log(response);
+        } catch (error) {
+            console.log(error)
+        }
+        return res.json({status: 'success'})
+    }
+    res.json({status: "fail", error: "No Such User"})
 })
 
 

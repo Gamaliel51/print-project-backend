@@ -17,6 +17,9 @@ const Student = sequelize.define('Student', {
     account: {
         type: DataTypes.STRING
     },
+    bank: {
+        type: DataTypes.STRING
+    },
     history: {
         type: DataTypes.ARRAY(DataTypes.TEXT)
     }

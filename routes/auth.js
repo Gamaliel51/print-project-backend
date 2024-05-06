@@ -32,7 +32,7 @@ router.post('/login', checkAuth, async (req, res) => {
     }
 })
 .post('/signup', async (req, res) => {
-    const  { username, password, email } = req.body
+    const  { username, password, email, account, bank } = req.body
 
     const in_use = await Student.findOne({where: {matric: username.toLowerCase()}})
     if(in_use){
@@ -41,13 +41,13 @@ router.post('/login', checkAuth, async (req, res) => {
 
     const hashedPass = await bcrypt.hash(password, 10)
 
-    const user = await Student.create({matric: username.toLowerCase(), password: hashedPass, email: email, credits: 0, history: []})
+    const user = await Student.create({matric: username.toLowerCase(), password: hashedPass, email: email, credits: 0, account: account, bank: bank, history: []})
     await user.save()
 
     res.json({status: 'success'})
 })
 .post('/update', checkAuth, async (req, res) => {
-    const  { username, password, email } = req.body
+    const  { username, password, email, account, bank } = req.body
 
     if(username.toLowerCase() !== req.user.username){
         return res.json({status: 'fail', error: 'you cannot change your matric number'})
@@ -64,7 +64,7 @@ router.post('/login', checkAuth, async (req, res) => {
         hashedPass = await bcrypt.hash(password, 10)
     }
 
-    await user.update({matric: req.user.username, password: hashedPass, email: email, credits: user.credits, history: user.history})
+    await user.update({matric: req.user.username, password: hashedPass, email: email, credits: user.credits, account: account, bank: bank, history: user.history})
 
     res.json({status: 'success'})
 })
