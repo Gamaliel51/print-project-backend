@@ -68,16 +68,16 @@ app.post('/withdraw', cors(), checkAuth, async (req, res) => {
             const response = await flw.Transfer.initiate(payload)
             console.log(response);
             if(response.message === 'This request cannot be processed. pls contact your account administrator'){
-                const credits = credits - cost
+                const credits = user.credits - amount
                 user.credits = credits
-                await user.save
+                await user.save()
 
                 return res.json({status: 'success'})
             }
             if(response.status === 'success'){
-                const credits = credits - cost
+                const credits = user.credits - amount
                 user.credits = credits
-                await user.save
+                await user.save()
 
                 return res.json({status: 'success'})
             }
