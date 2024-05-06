@@ -66,6 +66,25 @@ app.post('/printerlogin', async (req, res) => {
 })
 
 
+app.post('/markdone', async (req, res) => {
+    try{
+        const docname = req.body.doc
+        const doc = await PrintRecord.findOne({where: {docname: docname}})
+        if(doc){
+            await doc.update({printed: true})
+            await doc.save()
+
+            return res.json({status: 'success'})
+        }
+        return res.json({status: 'fail', error: 'No such document'})
+    }
+    catch(e){
+        console.error(e)
+        res.json({status: 'fail', error: 'server error'})
+    }
+})
+
+
 app.post('/withdraw', cors(), checkAuth, async (req, res) => {
     const {amount} = req.body
     console.log("AMOUNT: ", amount, Number(amount))
