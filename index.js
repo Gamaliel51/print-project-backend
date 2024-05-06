@@ -47,6 +47,7 @@ app.post('/getpagenum', upload.array('files', 1), async (req, res) => {
 
 app.post('/withdraw', cors(), checkAuth, async (req, res) => {
     const {amount} = req.body
+    console.log("AMOUNT: ", amount, Number(amount))
     const user = await Student.findOne({where: {matric: req.user.username}})
     if(user){
         if(amount > user.credits){
@@ -61,8 +62,6 @@ app.post('/withdraw', cors(), checkAuth, async (req, res) => {
             "narration": "CU Print withdrawal",
             "currency": "NGN",
             "reference": `${user.matric}-${Date.now()}`,
-            "callback_url": "https://www.flutterwave.com/ng/",
-            "debit_currency": "NGN"
         }
     
             const response = await flw.Transfer.initiate(payload)
