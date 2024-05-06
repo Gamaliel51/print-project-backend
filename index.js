@@ -50,7 +50,7 @@ app.post('/printerlogin', async (req, res) => {
     try{
         const user = await Printer.findOne({where: {username: req.body.username}})
         if(user){
-            const passcheck  = await bcrypt.compare(password, user.password)
+            const passcheck  = await bcrypt.compare(req.body.password, user.password)
             if(passcheck){
                 return res.json({status: 'success'})
             }
