@@ -11,6 +11,7 @@ const authRoute = require('./routes/auth')
 const { checkAuth } = require('./controller/authMiddleware')
 const Student = require('./models/Student')
 const PrintRecord = require('./models/PrintRecord')
+const Printer = require('./models/Printer')
 
 const flw = new Flutterwave(process.env.FLW_PUBLIC_KEY, process.env.FLW_SECRET_KEY  );
 
@@ -42,6 +43,25 @@ app.post('/getpagenum', upload.array('files', 1), async (req, res) => {
     const file = req.files[0]
     const pages = await DocxCounter.count(file.buffer)
     res.json({num: pages})
+})
+
+
+app.post('/printerlogin', async (req, res) => {
+    try{
+        const user = await Printer.findOne({where: {username: req.body.username}})
+        if(user){
+            const passcheck  = await bcrypt.compare(password, user.password)
+            if(passcheck){
+                return res.json({status: 'success'})
+            }
+            return res.json({status: 'fail', error: 'wrong usernmae or password'})
+        }
+        res.json({status: 'fail', error: 'wrong usernmae or password'})
+    }
+    catch(e){
+        console.error(e)
+        res.json({status: 'fail', error: 'server error'})
+    }
 })
 
 
