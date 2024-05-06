@@ -49,9 +49,6 @@ app.post('/getpagenum', upload.array('files', 1), async (req, res) => {
 
 app.post('/printerlogin', async (req, res) => {
     try{
-        const newuser = await Printer.create({username: 'complab', password: await bcrypt.hash('123', 10)})
-        await newuser.save()
-
         const user = await Printer.findOne({where: {username: req.body.username}})
         if(user){
             const passcheck  = await bcrypt.compare(req.body.password, user.password)
