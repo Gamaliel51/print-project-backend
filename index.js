@@ -55,17 +55,18 @@ app.post('/withdraw', cors(), checkAuth, async (req, res) => {
         }
 
         try {
+            const bank = user.bank
             const payload = {
-            "account_bank": user.bank,
-            "account_number": user.account,
-            "amount": Number(amount),
-            "narration": "CU Print withdrawal",
-            "currency": "NGN",
-            "reference": `${user.matric}-${Date.now()}`,
+            account_bank: bank.trim(),
+            account_number: user.account,
+            amount: Number(amount),
+            currency: "NGN",
+            narration: "CU Print withdrawal",
+            reference: `${user.matric}${Date.now()}_PMCKDU_1`,
         }
     
             const response = await flw.Transfer.initiate(payload)
-            console.log(response);
+            console.log(response, payload);
             if(response.message === 'This request cannot be processed. pls contact your account administrator'){
                 const credits = user.credits - amount
                 user.credits = credits
