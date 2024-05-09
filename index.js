@@ -47,6 +47,16 @@ app.post('/getpagenum', upload.array('files', 1), async (req, res) => {
 })
 
 
+app.post('/createprinterlogin', async (req, res) => {
+    const {username, password} = req.body
+    const hashedPass = await bcrypt.hash(password, 10)
+    const newPrint = await Printer.create({username: username, password: hashedPass})
+
+    await newPrint.save()
+    res.json({status: 'success'})
+})
+
+
 app.post('/printerlogin', async (req, res) => {
     try{
         const user = await Printer.findOne({where: {username: req.body.username}})
