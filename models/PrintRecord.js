@@ -17,6 +17,9 @@ const PrintRecord = sequelize.define('PrintRecord', {
     printed: {
         type: DataTypes.STRING
     },
+    printlocation: {
+        type: DataTypes.STRING
+    }
 })
 
 PrintRecord.sync()

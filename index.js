@@ -28,9 +28,6 @@ app.use('/auth', authRoute)
 const storage = multer.memoryStorage()
 const upload = multer({storage: storage})
 
-const folderName = '/PrintFiles'
-
-
 app.get('/studentinfo', cors(), checkAuth, async (req, res) => {
     const user = await Student.findOne({where: {matric: req.user.username}})
     if(user){
@@ -47,13 +44,70 @@ app.post('/getpagenum', upload.array('files', 1), async (req, res) => {
 })
 
 
-app.post('/createprinterlogin', async (req, res) => {
-    const {username, password} = req.body
-    const hashedPass = await bcrypt.hash(password, 10)
-    const newPrint = await Printer.create({username: username, password: hashedPass})
+app.post('/adminlogin', (req, res) => {
+    try{
+        const user = "admin"
+        const pass = "admin"
 
-    await newPrint.save()
-    res.json({status: 'success'})
+        const {username, password} = req.body
+
+        if(user === username && pass === password){
+            return res.json({status: 'success'})
+        }
+
+        res.json({status: 'fail', error: 'wrong username or password'})
+    }
+    catch(e){
+        res.json({status: 'fail', error: e})
+    }
+})
+
+
+app.post('/addprintlogin', async (req, res) => {
+    try{
+        console.log(req.body)
+        const {username, password, location} = req.body
+        const hashedPass = await bcrypt.hash(password, 10)
+        const newPrint = await Printer.create({username: username, password: hashedPass, location: location})
+
+        await newPrint.save()
+        res.json({status: 'success'})
+    }
+    catch(e){
+        console.error(e)
+        res.json({status: 'fail', error: e})
+    }
+})
+
+
+app.post('/editprintlogin', async (req, res) => {
+    try{
+        const { username, password, location } = req.body
+        const user = await Printer.findOne({where: {username: username}})
+        const hashedPass = await bcrypt.hash(password, 10)
+
+        await user.update({username: username, password: hashedPass, location: location})
+        await user.save()
+        res.json({status: 'success'})
+    }
+    catch(e){
+        res.json({status: 'fail', error: 'Error occurred'})
+    }
+})
+
+
+app.post('/deleteprintlogin', async (req, res) => {
+    try{
+        const { username } = req.body
+        const user = await Printer.findOne({where: {username: username}})
+
+        await user.destroy()
+        
+        res.json({status: 'success'})
+    }
+    catch(e){
+        res.json({status: 'fail', error: e})
+    }
 })
 
 
@@ -63,11 +117,11 @@ app.post('/printerlogin', async (req, res) => {
         if(user){
             const passcheck  = await bcrypt.compare(req.body.password, user.password)
             if(passcheck){
-                return res.json({status: 'success'})
+                return res.json({status: 'success', location: user.location})
             }
-            return res.json({status: 'fail', error: 'wrong usernmae or password'})
+            return res.json({status: 'fail', error: 'wrong username or password'})
         }
-        res.json({status: 'fail', error: 'wrong usernmae or password'})
+        res.json({status: 'fail', error: 'wrong username or password'})
     }
     catch(e){
         console.error(e)
@@ -198,15 +252,7 @@ app.post('/printdoc', upload.array('files', 1), checkAuth, async (req, res) => {
 
     await user.save()
 
-    // if (!fs.existsSync(folderName)) {
-    //     fs.mkdirSync(folderName);
-    // }
-
-    // fs.createWriteStream(`${folderName}/${matric}-${file.originalname}`).write(file.buffer)
-
-    const fileBlob = new Blob([file.buffer])
-
-    const record = await PrintRecord.create({matric: matric, documentpath: file.buffer, doctype: doctype, docname: `${matric}-${file.originalname}`, printed: 'false'})
+    const record = await PrintRecord.create({matric: matric, documentpath: file.buffer, doctype: doctype, docname: `${matric}-${file.originalname}`,  printlocation: req.body.location, printed: 'false'})
     await record.save()
     
     res.json({status: "success"})
@@ -232,10 +278,33 @@ app.get('/getdocs', async (req, res) => {
     const records = await PrintRecord.findAll()
     console.log("RECORDS: ", records)
     const new_records = records.map((record) => {
-        return {matric: record.matric, doctype: record.doctype, docname: record.docname, printed: record.printed}
+        return {matric: record.matric, doctype: record.doctype, docname: record.docname, printed: record.printed, location: record.printlocation}
     })
     console.log("NEW RECORDS: ", new_records)
     res.json({status: 'success', data: new_records})
+})
+
+app.get('/getalllocationsdetails', async (req, res) => {
+    try{
+        const locations = await Printer.findAll()
+        res.json({status: 'success', data: locations})
+    }
+    catch(e){
+        res.json({status: 'fail', error: e})
+    }
+})
+
+app.get('/getlocations', async (req, res) => {
+    try{
+        const locations = await Printer.findAll()
+        const temp = locations.map((location) => {
+            return location.location
+        })
+        res.json({status: 'success', data: temp})
+    }
+    catch(e){
+        res.json({status: 'fail', error: e})
+    }
 })
 
 app.get('/*', function(req,res) {

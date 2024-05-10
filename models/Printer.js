@@ -7,6 +7,9 @@ const Printer = sequelize.define('Printer', {
     },
     password: {
         type: DataTypes.STRING
+    },
+    location: {
+        type: DataTypes.STRING
     }
 })
 
