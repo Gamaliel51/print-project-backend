@@ -219,7 +219,7 @@ app.post('/addpayment', async (req, res) => {
 })
 
 
-app.post('/printdoc/:location', upload.array('files', 1), checkAuth, async (req, res) => {
+app.post('/printdoc/:id', upload.array('files', 1), checkAuth, async (req, res) => {
     const file = req.files[0]
     const params = req.params
     const matric = req.user.username
@@ -253,7 +253,7 @@ app.post('/printdoc/:location', upload.array('files', 1), checkAuth, async (req,
 
     await user.save()
 
-    const record = await PrintRecord.create({matric: matric, documentpath: file.buffer, doctype: doctype, docname: `${matric}-${file.originalname}`,  printlocation: params.location, printed: 'false'})
+    const record = await PrintRecord.create({matric: matric, documentpath: file.buffer, doctype: doctype, docname: `${matric}-${file.originalname}`,  printlocation: params.id, printed: 'false'})
     await record.save()
     
     res.json({status: "success"})
